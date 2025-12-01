@@ -14,11 +14,16 @@ fn main() {
         .collect();
 
     let mut dial: i16 = 50;
-    let mut zero_count = 0;
+    let mut zero_hit_count = 0;
+    let mut zero_pass_count = 0;
     
     for (direction, number) in rotations {
         println!("{direction} {number}");
         
+        zero_pass_count = zero_pass_count + number / 100;
+        let number = number % 100;
+        let initial_dial = dial;
+
         dial = if direction == 'R' {
             dial + number
         } else {
@@ -27,19 +32,31 @@ fn main() {
         
         dial = if dial > 0 {
             dial
+        } else if dial == 0 {
+            zero_pass_count = zero_pass_count + 1; 
+            dial
         } else {
+            if initial_dial != 0 {
+                zero_pass_count = zero_pass_count + 1;
+            }
             100 + dial
         };
         
-        dial = dial % 100;
+        dial = if dial > 99 {
+            zero_pass_count = zero_pass_count + 1;
+            dial % 100
+        } else {
+            dial
+        };
         println!("Current dial: {dial}");
 
-        zero_count = if dial == 0 {
-            zero_count + 1
+        zero_hit_count = if dial == 0 {
+            zero_hit_count + 1
         } else {
-            zero_count
+            zero_hit_count
         };
     }
     
-    println!("Password is: {zero_count}");
+    println!("Password part 1 is: {zero_hit_count}");
+    println!("Password part 2 is: {zero_pass_count}");
 }
