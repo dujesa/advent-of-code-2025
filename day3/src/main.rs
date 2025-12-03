@@ -51,7 +51,6 @@ fn main() {
             .collect::<Vec<_>>()
             .join("");
 
-        println!("{}", full_max);
         result = result + full_max.parse::<i128>().unwrap();
     }
     
