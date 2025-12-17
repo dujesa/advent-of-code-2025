@@ -1,4 +1,4 @@
-use std::{cmp::{max, min}, collections::HashMap, fs};
+use std::{cmp::{max, min}, fs};
 
 impl Point {
     fn get_distance(&self, pt: &Point) -> f64 {
@@ -46,7 +46,7 @@ fn main() {
     }
     connections.sort_by(|a, b| a.0.partial_cmp(&b.0).unwrap());
 
-    for (_, i, j) in connections.iter().take(1_000) {
+    for (_, i, j) in connections.iter().take(1000) {
         union_merge(&mut parents, *i, *j);
     }
 
@@ -65,6 +65,31 @@ fn main() {
     }
 
     println!("part one, product - {}", top_group_sizes_product);
+
+    let mut parents: Vec<usize> = (0..points.len()).collect();
+
+    let mut last_pair: (usize, usize) = (0, 0);
+    let mut merge_count = 0;
+
+    for (_, i, j) in connections.iter() {
+        if union_find(&mut parents, *i) == union_find(&mut parents, *j) {
+            continue;
+        }
+
+        union_merge(&mut parents, *i, *j);
+        merge_count += 1;
+
+        if merge_count == points.len() - 1 {
+            last_pair = (*i, *j);
+        } 
+    }
+
+    let (i, j) = last_pair;
+    println!("{:?} {:?}", points[i], points[j]);
+
+    let x_product = points[i].x * points[j].x;
+    println!("{x_product}");
+
 }
 
 fn union_find(parents: &mut Vec<usize>, i: usize) -> usize {
@@ -79,9 +104,11 @@ fn union_merge(parents: &mut Vec<usize>, i: usize, j: usize) {
     let i_parent = union_find(parents, i);
     let j_parent = union_find(parents, j);
     
-
+    let min = min(i_parent, j_parent);
+    let max = max(i_parent, j_parent);
+    
     if i_parent != j_parent {
-        parents[j_parent] = i_parent;
+        parents[max] = min;
     }
 }
 
